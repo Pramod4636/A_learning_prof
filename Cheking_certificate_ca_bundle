@@ -1,0 +1,63 @@
+import os
+import ssl
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from datetime import datetime
+
+# === Path to your CA bundle file ===
+ca_bundle_path = "certs/ca_bundle.crt"
+
+# === Step 1: Check file existence ===
+if not os.path.isfile(ca_bundle_path):
+    print(f"❌ File not found: {ca_bundle_path}")
+    exit(1)
+else:
+    print(f"✅ Found CA bundle: {ca_bundle_path}")
+
+# === Step 2: Load all certs from bundle ===
+def load_certificates_from_bundle(path):
+    with open(path, "rb") as f:
+        pem_data = f.read()
+
+    certs = []
+    parts = pem_data.split(b"-----END CERTIFICATE-----")
+    for part in parts:
+        if b"-----BEGIN CERTIFICATE-----" in part:
+            cert_pem = part + b"-----END CERTIFICATE-----\n"
+            try:
+                cert = x509.load_pem_x509_certificate(cert_pem, default_backend())
+                certs.append(cert)
+            except Exception as e:
+                print(f"❌ Failed to parse one certificate: {e}")
+    return certs
+
+# === Step 3: Display cert info ===
+def print_cert_summary(cert, index):
+    subject = cert.subject.rfc4514_string()
+    issuer = cert.issuer.rfc4514_string()
+    not_before = cert.not_valid_before
+    not_after = cert.not_valid_after
+    now = datetime.utcnow()
+
+    print(f"\n--- Certificate #{index + 1} ---")
+    print(f"Issuer:  {issuer}")
+    print(f"Subject: {subject}")
+    print(f"Valid From: {not_before}")
+    print(f"Valid To:   {not_after}")
+
+    if not_before <= now <= not_after:
+        print("✅ This certificate is currently VALID")
+    else:
+        print("❌ This certificate is EXPIRED or not yet valid")
+
+# === Run ===
+certs = load_certificates_from_bundle(ca_bundle_path)
+
+if not certs:
+    print("❌ No certificates found in CA bundle.")
+    exit(1)
+
+print(f"\nTotal certificates found: {len(certs)}")
+
+for i, cert in enumerate(certs):
+    print_cert_summary(cert, i)
