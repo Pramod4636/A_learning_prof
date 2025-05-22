@@ -1,0 +1,50 @@
+import os
+import requests
+
+# Client certificate and key
+client_cert_path = "certs/certs_client/client_cert.pem"
+client_key_path = "certs/certs_client/client_key.pem"
+
+# CA bundle for verifying server
+ca_bundle_path = "certs/verify/ca_bundle.crt"
+
+# Sample target URL (replace with actual API)
+url = "https://api.example.com/secure-endpoint"
+
+# Proxy settings (optional - replace or remove if not needed)
+proxies = {
+    "https": "http://your-proxy.example.com:8080",
+    "http": "http://your-proxy.example.com:8008"
+}
+
+# JSON body payload
+body = {
+    "root": {
+        "item": {
+            "auth": "YourAuthPassword",
+            "sessionid": "12345",
+            "some_var": "This is a sample test call",
+            "message": "SampleMessage001$SampleMessage002",
+            "Subject": "Sample_Workflow"
+        }
+    }
+}
+
+try:
+    print("Inside try block")
+
+    # Send POST request with SSL and proxy configuration
+    response = requests.post(
+        url,
+        json=body,
+        proxies=proxies,
+        verify=ca_bundle_path,
+        cert=(client_cert_path, client_key_path)
+    )
+
+    print("Response received")
+    print("Status Code:", response.status_code)
+    print("Response Body:", response.text)
+
+except requests.exceptions.RequestException as e:
+    print("Request failed:", e)
