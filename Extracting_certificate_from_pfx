@@ -1,0 +1,49 @@
+from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
+from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
+from cryptography.hazmat.backends import default_backend
+import os
+
+# File paths
+pfx_path = "certs/S206373.pfx"
+client_cert_path = "certs/certs_client/client_cert.pem"
+client_key_path = "certs/certs_client/client_key.pem"
+ca_bundle_path = "certs/verify/ca_bundle.crt"
+
+# PFX password (update this securely)
+pfx_password = b"your_pfx_password"  # Example: b"password123" or b"" if no password
+
+# Load .pfx file
+with open(pfx_path, "rb") as pfx_file:
+    pfx_data = pfx_file.read()
+
+# Extract key, certificate, and CA certs
+private_key, certificate, additional_certs = load_key_and_certificates(
+    pfx_data,
+    pfx_password,
+    backend=default_backend()
+)
+
+# Write client certificate
+if certificate:
+    with open(client_cert_path, "wb") as cert_file:
+        cert_file.write(certificate.public_bytes(Encoding.PEM))
+    print(f"Client certificate saved to: {client_cert_path}")
+
+# Write private key
+if private_key:
+    with open(client_key_path, "wb") as key_file:
+        key_file.write(private_key.private_bytes(
+            encoding=Encoding.PEM,
+            format=PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=NoEncryption()
+        ))
+    print(f"Client private key saved to: {client_key_path}")
+
+# Write CA certificates (if any)
+if additional_certs:
+    with open(ca_bundle_path, "wb") as ca_file:
+        for cert in additional_certs:
+            ca_file.write(cert.public_bytes(Encoding.PEM))
+    print(f"CA bundle saved to: {ca_bundle_path}")
+else:
+    print("No additional CA certificates found in PFX.")
