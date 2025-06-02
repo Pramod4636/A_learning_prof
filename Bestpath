@@ -1,0 +1,51 @@
+import heapq
+
+def read_graph_from_file(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    
+    num_nodes = int(lines[0].strip())
+    graph = {i: [] for i in range(num_nodes)}
+    
+    for line in lines[1:]:
+        u, v, weight, risk = map(int, line.strip().split())
+        graph[u].append((v, weight, risk))
+        graph[v].append((u, weight, risk))  # because routes are bidirectional
+    
+    return graph
+
+def find_best_path(graph, start, target):
+    # Priority queue will store (total_cost, total_risk, current_node, path)
+    # We sort by total_cost first, then by risk (as tie breaker)
+    pq = [(0, 0, start, [start])]
+    visited = set()
+    
+    while pq:
+        cost, risk, node, path = heapq.heappop(pq)
+        
+        if (node in visited):
+            continue
+        visited.add(node)
+        
+        if node == target:
+            print(f"Found target node {target}, cost (distance + risk) = {cost}, risk = {risk}")
+            print(f"Path to target: {path}")
+            return cost
+        
+        for neighbor, weight, neighbor_risk in graph[node]:
+            if neighbor not in visited:
+                total_weight = cost + weight + neighbor_risk
+                total_risk = risk + neighbor_risk
+                heapq.heappush(pq, (total_weight, total_risk, neighbor, path + [neighbor]))
+    
+    return float('inf')  # if no path found
+
+# ---------------------
+# Set your team number
+TEAM_NUMBER = 51  # 👈 Change this to your actual team number
+
+# Load graph and compute result
+graph = read_graph_from_file("large_dataset.txt")
+best_cost = find_best_path(graph, 0, TEAM_NUMBER)
+
+print(f"✅ Best path cost (distance + risk): {best_cost}")
