@@ -1,0 +1,46 @@
+import re
+
+def is_valid_codeword(word, team_num):
+    # Condition 1: 'A' occurs exactly once
+    if word.count('A') != 1:
+        return False
+    
+    # Count frequency of each letter (only alphabets)
+    letters = [c for c in word if c.isalpha()]
+    freq = {}
+    for c in letters:
+        freq[c] = freq.get(c, 0) + 1
+    
+    # Condition 2: Exactly 3 letters (other than 'A') appear exactly twice
+    twice_count_letters = [ch for ch, count in freq.items() if count == 2 and ch != 'A']
+    if len(twice_count_letters) != 3:
+        return False
+    
+    # Condition 3: Team number digit presence and position check
+    team_digit = str(team_num)
+    if team_digit not in word:
+        return False
+    
+    # Find all occurrences of team number digit in word
+    indices = [m.start() for m in re.finditer(team_digit, word)]
+    
+    # Check each occurrence for validity: start of word or preceded by a letter
+    for idx in indices:
+        if idx == 0:
+            return True
+        elif word[idx-1].isalpha():
+            return True
+    
+    # If no valid occurrence found
+    return False
+
+# Example usage
+team_number = 26  # Replace with your team number
+filename = 'large_dataset.txt'  # Replace with your actual filename
+
+with open(filename, 'r') as file:
+    for line in file:
+        codeword = line.strip()
+        if is_valid_codeword(codeword, team_number):
+            print(f"Matching codeword found: {codeword}")
+            break
