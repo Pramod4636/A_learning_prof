@@ -1,0 +1,45 @@
+import csv
+
+def read_intervals(filename):
+    intervals = []
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row) >= 2:
+                try:
+                    start = int(row[0].strip())
+                    end = int(row[1].strip())
+                    intervals.append([start, end])
+                except ValueError:
+                    continue  # skip invalid rows
+    return intervals
+
+def merge_intervals(intervals):
+    if not intervals:
+        return []
+
+    # Sort intervals by start time
+    intervals.sort(key=lambda x: x[0])
+    merged = [intervals[0]]
+
+    for current in intervals[1:]:
+        last = merged[-1]
+        if current[0] <= last[1]:  # overlapping
+            last[1] = max(last[1], current[1])  # merge
+        else:
+            merged.append(current)
+
+    return merged
+
+if __name__ == "__main__":
+    # Change this path if needed
+    input_file = 'test/inputs/test0.csv'
+    
+    # Step 1: Read intervals from file
+    sailor_intervals = read_intervals(input_file)
+
+    # Step 2: Merge intervals to form ships
+    ship_intervals = merge_intervals(sailor_intervals)
+
+    # Step 3: Print the sorted, merged ship intervals
+    print(ship_intervals)
