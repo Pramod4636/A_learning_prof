@@ -1,0 +1,38 @@
+import re
+from collections import Counter
+
+def is_valid_codeword(word, team_number):
+    team_str = str(team_number)
+
+    # 1. Check that 'A' appears exactly once
+    if word.count('A') != 1:
+        return False
+
+    # 2. Count letters excluding digits and 'A'
+    letter_counts = Counter([ch for ch in word if ch.isalpha() and ch != 'A'])
+    # Exactly 3 letters appear exactly 2 times
+    if len([ch for ch, count in letter_counts.items() if count == 2]) != 3:
+        return False
+
+    # 3. Check team number appears and is either at start or after a letter
+    for match in re.finditer(team_str, word):
+        idx = match.start()
+        if idx == 0 or word[idx - 1].isalpha():
+            return True
+
+    return False
+
+def find_codewords_from_file(filename, team_number):
+    with open(filename, 'r') as file:
+        codewords = [line.strip() for line in file if line.strip()]
+    return [word for word in codewords if is_valid_codeword(word, team_number)]
+
+# === USAGE ===
+if __name__ == "__main__":
+    team_number = 3  # Change this to your actual team number
+    filename = "input.txt"
+    valid_codewords = find_codewords_from_file(filename, team_number)
+
+    print("Valid codewords:")
+    for word in valid_codewords:
+        print(word)
