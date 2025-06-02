@@ -1,0 +1,88 @@
+import hashlib
+from collections import deque
+
+# -------------------------------
+# Configuration
+# -------------------------------
+TEAM_NUMBER = 26
+START = (2, 3)
+DEST = (5292 + 2 * TEAM_NUMBER, 12783 * TEAM_NUMBER)
+
+# -------------------------------
+# Generate Blocked Squares
+# -------------------------------
+def generate_blocked_squares(team_number):
+    blocked = set()
+    x = 1007 * team_number
+    y = 2004 * team_number
+
+    x_step = 40 * (team_number % 11)
+    y_step = 100 - (team_number % 7)
+
+    for _ in range(10000):  # Safe upper bound; adjust if needed
+        pos1 = (x, y)
+        pos2 = (x * (team_number % 5), y * (team_number % 3))
+        blocked.add(pos1)
+        blocked.add(pos2)
+
+        # Early exit optimization
+        if pos1[0] > DEST[0] + 500 or pos1[1] > DEST[1] + 500:
+            break
+
+        x += x_step
+        y += y_step
+
+    return blocked
+
+# -------------------------------
+# Knight Moves
+# -------------------------------
+KNIGHT_MOVES = [
+    (2, 1), (1, 2), (-1, 2), (-2, 1),
+    (-2, -1), (-1, -2), (1, -2), (2, -1)
+]
+
+# -------------------------------
+# BFS Algorithm
+# -------------------------------
+def min_knight_moves(start, dest, blocked):
+    queue = deque()
+    visited = set()
+
+    queue.append((start[0], start[1], 0))  # (x, y, moves)
+    visited.add(start)
+
+    while queue:
+        x, y, moves = queue.popleft()
+
+        if (x, y) == dest:
+            return moves
+
+        for dx, dy in KNIGHT_MOVES:
+            nx, ny = x + dx, y + dy
+
+            if (nx, ny) not in visited and (nx, ny) not in blocked:
+                visited.add((nx, ny))
+                queue.append((nx, ny, moves + 1))
+
+    return -1  # No path found
+
+# -------------------------------
+# Main Logic
+# -------------------------------
+def main():
+    blocked_squares = generate_blocked_squares(TEAM_NUMBER)
+    min_moves = min_knight_moves(START, DEST, blocked_squares)
+
+    if min_moves == -1:
+        print("No valid path found.")
+        return
+
+    print(f"Minimum moves: {min_moves}")
+
+    # Hashing the result
+    hash_result = hashlib.sha256(str(min_moves).encode()).hexdigest()
+    print(f"SHA-256 Hash: {hash_result}")
+
+if __name__ == "__main__":
+    main()
