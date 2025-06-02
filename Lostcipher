@@ -1,0 +1,36 @@
+def shift_char(c, shift):
+    if c.isalpha():
+        if c.isupper():
+            base = ord('A')
+        else:
+            base = ord('a')
+        # Calculate new position with wrap-around
+        new_pos = (ord(c) - base + shift) % 26
+        return chr(base + new_pos)
+    else:
+        return c
+
+def encode_word(word):
+    encoded = []
+    for i, ch in enumerate(word):
+        encoded.append(shift_char(ch, i))
+    return "".join(encoded)
+
+# Convert team number to word form (simple example)
+def number_to_words(n):
+    # For simplicity, hardcode or use external lib like 'num2words' in real code
+    words_map = {
+        1: "one", 2: "two", 3: "three", 4: "four", 5:"five",
+        6:"six", 7:"seven", 8:"eight", 9:"nine", 10:"ten",
+        98:"ninetyeight"
+        # Extend this map as needed
+    }
+    return words_map.get(n, str(n))
+
+# Example usage:
+team_number = 98
+key = "SuperVeryHardChallengeForTeamNumber" + number_to_words(team_number)
+encoded_key = encode_word(key)
+
+print("Original Key:", key)
+print("Encoded Key :", encoded_key)
