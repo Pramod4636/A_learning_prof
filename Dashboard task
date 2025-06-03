@@ -1,0 +1,244 @@
+Here's a detailed guide describing exactly what you want to build for the Migration Execution Dashboard (based on the UBS VnX Execution Summary) in a complete and clear scope. This is ideal for handing over to a developer or team to implement.
+
+
+---
+
+🧭 Project Overview
+
+Name: Migration Execution Dashboard
+Goal: A web dashboard that visualizes the progress of application/server migrations across various landing zones (Azure Migrate, AVS, Decommission, IaaS Legacy, etc.), broken down by Line of Business (LoB), including rollback tracking and near-term planning.
+
+Target Audience: Program Managers, Cloud Architects, Infra/Cloud Ops Team
+
+
+---
+
+📊 Features & Visual Requirements
+
+1. Total Migrations Overview
+
+A donut chart showing the total number of planned and completed migrations.
+
+Slices represent:
+
+AVS
+
+Azure Migrate
+
+Decommission
+
+IaaS Legacy
+
+IaaS Legacy (Gold)
+
+
+The total number (e.g., 55,140) is shown in the center.
+
+
+
+---
+
+2. Landing Zone Details (Widgets)
+
+Horizontal gauge-style widgets showing:
+
+Total migrated using Azure Migrate
+
+Total migrated using AVS
+
+AVS subnets unstretched (progress bar)
+
+
+
+
+---
+
+3. Detailed Migration Table by LoB
+
+Table showing total migrated workloads by:
+
+Line of Business (e.g., GOTO AM, GOTO Group Functions)
+
+Landing zone used (AVS, Azure Migrate, etc.)
+
+Region (optional)
+
+
+Columns:
+
+LoB
+
+AVS
+
+Azure Migrate
+
+Decommission
+
+IaaS Legacy
+
+IaaS Legacy (Gold)
+
+Total
+
+
+
+
+---
+
+4. “Left to Migrate” Table
+
+Similar format to the above, showing workloads that are still pending migration.
+
+Helps identify remaining effort by LoB and migration type.
+
+
+
+---
+
+5. Rollback Summary Table
+
+A table that tracks how many workloads were rolled back after migration attempts.
+
+Columns:
+
+LoB
+
+Count by landing zone
+
+Total rollbacks
+
+
+
+
+---
+
+6. Planned Migrations (Next 2 Weeks)
+
+A section showing planned migrations in the next 2 calendar weeks.
+
+Can be a table or compact card showing:
+
+LoB
+
+Number of upcoming migrations
+
+
+
+
+---
+
+📁 Functional & Technical Requirements
+
+✅ Must-Have
+
+Responsive, clean React UI (desktop-first, mobile-friendly optional)
+
+Real-time or periodically refreshed data
+
+Modular React components for charts and tables
+
+Reusable state logic for filters (LoB, date, region)
+
+Mock API layer to simulate backend data
+
+
+🔐 Optional Add-ons
+
+Azure AD/MSAL login (if used internally)
+
+Data export to Excel
+
+User role-based views (e.g., PMs vs Infra team)
+
+
+
+---
+
+🧱 Component List
+
+Component Name	Description
+
+TotalMigrationsDonut	Donut chart showing overall migration by zone
+LandingZoneWidget	Mini horizontal meters for Azure Migrate, AVS, etc.
+MigrationTable	Table of completed migrations per LoB
+LeftToMigrateTable	Table of pending migrations per LoB
+RollbackTable	Table listing rollbacks per LoB and migration type
+PlannedMigrationWidget	Card/table for next 2-week plan
+FiltersBar	Filters for LoB, region, date
+
+
+
+---
+
+⚙️ Tech Stack Recommendation
+
+Frontend: React.js + Tailwind CSS or Material UI
+
+Charts: Recharts (lightweight and expressive)
+
+Data Source: JSON mock or Azure SQL API
+
+Auth: MSAL.js (for Azure login, optional)
+
+Hosting: Azure App Service or Static Web App
+
+
+
+---
+
+📊 Example Data Structure
+
+{
+  "total": 55140,
+  "zones": [
+    { "type": "AVS", "count": 16792 },
+    { "type": "Azure Migrate", "count": 10229 },
+    ...
+  ],
+  "lobData": [
+    {
+      "lob": "GOTO AM",
+      "AVS": 697,
+      "AzureMigrate": 157,
+      "Decommission": 13,
+      ...
+    }
+  ],
+  "plannedMigrations": [
+    { "lob": "GOTO IB", "planned": 231 }
+  ],
+  "rollbacks": [
+    { "lob": "GOTO Group", "AzureMigrate": 20, "AVS": 5, "total": 30 }
+  ]
+}
+
+
+---
+
+🗂️ Project Roadmap
+
+Phase	Deliverable
+
+Phase 1	Static layout with mock data
+Phase 2	Connect to live backend or JSON feed
+Phase 3	Add filtering, exports, enhancements
+Phase 4	Optional: Auth, access control
+
+
+
+---
+
+Would you like me to now generate:
+
+1. The React UI layout with components?
+
+
+2. A starter repo structure with sample data?
+
+
+3. Backend mock API setup in Node.js/Express?
+
+
+
+Let me know how deep you'd like to go next.
+
